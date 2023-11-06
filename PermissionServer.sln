@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PermissionServer", "PermissionServer\PermissionServer.csproj", "{9FC546DF-90BC-4943-9DF7-46269661686A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PermissionServer", "PermissionServer\PermissionServer.csproj", "{9FC546DF-90BC-4943-9DF7-46269661686A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CB6731E2-EB06-4FB2-89C1-7010A4FB8EAA}"
 	ProjectSection(SolutionItems) = preProject
@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleSite", "SampleSite\SampleSite.csproj", "{64CFEC6E-62FF-4A2C-80F9-155B60D38C7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{9FC546DF-90BC-4943-9DF7-46269661686A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FC546DF-90BC-4943-9DF7-46269661686A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FC546DF-90BC-4943-9DF7-46269661686A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64CFEC6E-62FF-4A2C-80F9-155B60D38C7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64CFEC6E-62FF-4A2C-80F9-155B60D38C7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64CFEC6E-62FF-4A2C-80F9-155B60D38C7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64CFEC6E-62FF-4A2C-80F9-155B60D38C7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
