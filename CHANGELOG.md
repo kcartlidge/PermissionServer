@@ -1,6 +1,6 @@
 # CHANGELOG
 
-- v0.1.3
+- v0.2.0
   - Initial solution and standard repo files
   - Background info added to the README file
   - Sample site added (DotNet 7 MVC, unchanged)
@@ -11,3 +11,4 @@
   - Mailer and configuration
   - Main Permission Server class
   - DI extention to register Permission Server
+  - Include Permission Server in the sample site

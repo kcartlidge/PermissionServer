@@ -1,0 +1,12 @@
+@model SampleSite.Models.RequestModels.ConfirmationRequest
+
+@{
+    ViewData["Title"] = "Confirm";
+}
+
+<h1>Login Confirmation</h1>
+
+<div>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <span asp-validation-for="ConfirmationCode" class="text-danger"></span>
+</div>
