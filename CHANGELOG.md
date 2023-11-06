@@ -1,9 +1,10 @@
 # CHANGELOG
 
-- 2023-11-06
+- v0.1.0
   - Initial solution and standard repo files
   - Background info added to the README file
   - Sample site added (DotNet 7 MVC, unchanged)
     - Cookie-based authentication configured and activated
     - Dashboard route added to check protection is enforced
   - ITokenStore interface and Token model
+  - In-memory token store and configuration
