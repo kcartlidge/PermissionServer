@@ -1,6 +1,6 @@
 # CHANGELOG
 
-- v0.1.1
+- v0.1.2
   - Initial solution and standard repo files
   - Background info added to the README file
   - Sample site added (DotNet 7 MVC, unchanged)
@@ -9,3 +9,4 @@
   - ITokenStore interface and Token model
   - In-memory token store and configuration
   - Mailer and configuration
+  - Main Permission Server class
