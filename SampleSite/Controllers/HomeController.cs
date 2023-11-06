@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SampleSite.Models;
 using System.Diagnostics;
 
@@ -14,6 +15,15 @@ namespace SampleSite.Controllers
         }
 
         public IActionResult Index()
+        {
+            return View();
+        }
+
+        // Sample protected page.
+        // MVC will automatically redirect this route to a login page, but
+        // that doesn't yet exist so it shows a 404 rather than a view.
+        [Authorize()]
+        public IActionResult Dashboard()
         {
             return View();
         }
