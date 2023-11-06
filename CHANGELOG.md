@@ -1,6 +1,6 @@
 # CHANGELOG
 
-- v0.1.0
+- v0.1.1
   - Initial solution and standard repo files
   - Background info added to the README file
   - Sample site added (DotNet 7 MVC, unchanged)
@@ -8,3 +8,4 @@
     - Dashboard route added to check protection is enforced
   - ITokenStore interface and Token model
   - In-memory token store and configuration
+  - Mailer and configuration
