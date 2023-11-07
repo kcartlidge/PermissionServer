@@ -1,5 +1,9 @@
 # CHANGELOG
 
+- v0.2.1
+  - Update README file
+  - Reduce visibility of some publics
+
 - v0.2.0
   - Initial solution and standard repo files
   - Background info added to the README file

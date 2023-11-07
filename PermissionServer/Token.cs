@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PermissionServer
 {
-    public class Token
+    internal class Token
     {
         public DateTime CreatedAt { get; }
         public DateTime ValidUntil { get; }
@@ -32,18 +32,18 @@ namespace PermissionServer
         /// Returns true if the (case-insensitive) confirmation
         /// code does NOT match.
         /// </summary>
-        public bool DoesNotMatch(string suggestedValidationCode)
-            => Matches(suggestedValidationCode) == false;
+        public bool DoesNotMatch(string suggestedConfirmationCode)
+            => Matches(suggestedConfirmationCode) == false;
 
         /// <summary>
         /// Returns true if the (case-insensitive) confirmation
         /// code matches.
         /// </summary>
-        public bool Matches(string suggestedValidationCode)
+        public bool Matches(string suggestedConfirmationCode)
         {
             return string.Equals(
                 ConfirmationCode,
-                suggestedValidationCode.Trim(),
+                suggestedConfirmationCode.Trim(),
                 StringComparison.OrdinalIgnoreCase);
         }
 

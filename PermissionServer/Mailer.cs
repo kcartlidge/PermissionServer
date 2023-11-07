@@ -7,7 +7,7 @@ using static PermissionServer.PermissionServerOptions;
 namespace PermissionServer
 {
     /// <summary>Handles sending standard emails.</summary>
-    public class Mailer
+    internal class Mailer
     {
         private readonly EmailOptions opts;
 

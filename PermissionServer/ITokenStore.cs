@@ -7,7 +7,7 @@ namespace PermissionServer
     /// If you want multi-tenant then prefix the key with a tenant id, for
     /// example "APP1|email@example.com" or "SITE2|email@example.com".
     /// </summary>
-    public interface ITokenStore
+    internal interface ITokenStore
     {
         /// <summary>
         /// Adds a new time-limited token.

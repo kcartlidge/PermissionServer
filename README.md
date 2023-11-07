@@ -2,67 +2,81 @@
 
 DotNet Nuget package providing password-less authentication with auto-expiring tokens (in an in-memory store; no database required) and confirmation emails.
 
-*Being licensed under the [AGPL](./LICENSE.txt) you are free to use Permission Server in any project whether open source, free, or commercial. For further clarity see here.*
+Add email-based sign-up/login to your site/app with minimal effort!
 
-**[Status:](./CHANGELOG.md)** Work in progress
+*Licensed under the [AGPL](./LICENSE.txt), you are free to use Permission Server in any project whether open source, free, or commercial. For further details [see here](./LICENSE.txt).*
+
+**[Status:](./CHANGELOG.md)** Alpha - working but not feature-complete
 
 *Copyright 2023 K Cartlidge.*
 
 ## Contents
 
-- [Initial features](#initial-features)
-- [Planned extra features](#planned-extra-features)
+[General](#general)
+
+- [Features](#features)
 - [Overview](#overview)
-  - [How does it work?](#how-does-it-work)
-  - [For personal sites](#for-personal-sites)
-  - [For larger sites](#for-larger-sites)
-- [What is the downside of storing tokens in memory?](#what-is-the-downside-of-storing-tokens-in-memory)
-- [What if the user's email is compromised?](#what-if-the-users-email-is-compromised)
-- [How do I use Permission Server in my project?](#how-do-i-use-permission-server-in-my-project)
-- [Licensing details](#licensing-details)
+- [Concerns](#concerns)
+- [License](#license)
 
-## Initial features
+[Using Permission Server in your code](#using-permission-server-in-your-code)
+  - [Registering Permission Server into your application's dependency container](#registering-permission-server-into-your-applications-dependency-container)
+  - [Issuing and confirming an email address via an emailed token](#issuing-and-confirming-an-email-address-via-an-emailed-token)
 
-- Email address validation
-- Configurable-lifetime auto-expiring tokens
+[About the sample MVC site](#about-the-sample-mvc-site)
+
+---
+
+## General
+
+### Features
+
+- Email address confirmation
+  - Suitable for account creation or login
+- Auto-expiring tokens (configurable lifetime)
 - Minimal supporting code required
 - No database needed
 
-## Planned extra features
+Potential future features:
 
-- Optional database token storage
-- Optional managing of accounts and access
+- Optional: multiple active tokens
+- Optional: database token storage
+- Optional: full accounts management
 
-## Overview
+### Overview
 
-The hardest details to steal are those that are never stored in the first place.
+The hardest details to steal from your systems are those that you never stored in the first place.
+With Permission Server you get the reassurance of confirmed email addresses for both account creation and login, but without the need to store passwords, security questions, or other high-value data.
 
-With Permission Server you get the security of confirmed email addresses for both account creation and login without the need to store passwords, security questions, or similar. Reduce your risk and for many apps/sites your overheads too due to the ability to skip a database.
+Reduce your risk and, for many apps/sites, your overheads too due to the ability to skip a database.
 
-### How does it work?
+#### How does it work?
 
-- Your app/site asks for an email address (only)
+- Your app/site asks for an email address
 - Permission Server generates a token and emails it to the user
-  - The user gets the token (their email provider is indirectly applying security *for* you)
+  - The user signs into their email (the email provider is indirectly applying security *for* you)
+  - The user reads your email, copies the token, and clicks a link back to your site
 - Your app/site has a confirmation screen/page asking for the email address and token
-  - Having the token from the email proves email address ownership
 - Permission Server validates the token is a match and has not expired
-- Your app/site can now either create an account or sign into one
+  - Having the token from the email account proves email address access
+  - Your app/site is now safe to either create an account or sign the user in
 
-### For personal sites
+#### For personal sites
 
 You may be writing your own blog or content site and want editing features.
 To allow this you need some kind of authentication to enable access to an admin area.
 
 As you don't need passwords you're free to store a list of admin email addresses in your appsettings file (for example).  Your login screen takes an email address and checks it against that allow-list.  If it's supported it emails a token.  By accessing that token in your email you prove who you are and can enter the admin area.
 
-### For larger sites
+#### For larger sites
 
 You'll probably have a database already, but there's no need to risk data loss by adding any password or recovery details into it; your database is unchanged.
 
 When a user confirms their email address via Permission Server you either sign them into their account (which exists in your database with a matching email address) or you take them through account creation based on that email address knowing that they have proven control of it.
 
-## What is the downside of storing tokens in memory?
+### Concerns
+
+#### What's the downside of storing tokens in memory?
 
 There *is* a downside. How important it *really* is to you depends upon your business, your site reliability, and your release frequency.
 
@@ -85,31 +99,171 @@ However there are mitigating factors:
 - Existing sessions will be maintained if you are using session cookies or similar; only token confirmations are affected
 - Users can simply request another token (try again)
 
-For the vast majority of cases these mitigations mean that the benefits of no database outweigh the limitation.
+For the vast majority of cases these mitigations mean that the benefits of no database outweigh any concerns.
 
-There is also the secondary downside of tokens consuming app/site memory. However volumes are usually very low and all used or expired tokens are automatically removed every time a new token is generated. Token growth is therefore limited to the window of your token lifetime.
+There is also the secondary downside of tokens consuming app/site memory as they are not stored in an external file or database. However volumes are usually very low (relating directly to the amount of users confirming tokens not the amount of users on the site), and all used or expired tokens are automatically removed every time a new token is generated. Token growth is therefore limited to the window of your token lifetime.
 
-Database support is a planned future feature if you still need it so watch this space.
+Database support is a planned future feature if you still need it, so watch this space.
 
-## What if the user's email is compromised?
+#### What if the user's email is compromised?
 
-We're relying on user access to a token in an email to prove email ownership.  If their email is compromised that opens up access to the token and therefore any other apps/sites protected by Permission Server.
+We're relying on users reading a token in an email to confirm access.  If their email is compromised that opens up access to the token and therefore any apps/sites protected by Permission Server.
 
-However *this is no more risky than a normal password-based system*.
+However *this is exactly the same risk as a typical password-based system*.
 
-Why?  A password-based system needs a forgotten password or password reset feature.  This works via their emails, which means if their email account has been compromised they are equally at risk.
+Why?  A password-based system generally has a forgotten or reset password feature.  This works via their emails, which means if their email account has been compromised they are equally at risk as that's now working as a password-less system in that they get to set/reset their password based on their ability to access the recovery email.
 
-The only protection is another factor (eg SMS or TOTP codes) which you are free to add to a password-less system as well as a password-based one and requires the same amount of effort regardless.
+The only real extra protection is two-factor/multi-factor (eg SMS or TOTP codes) which you are free to add to a password-less system just as you would a password-based one; it requires the same amount of effort regardless.
 
-## How do I use Permission Server in my project?
+### License
 
-As the codebase progresses this section will be updated.
+*Being licensed under the [AGPL](./LICENSE.txt) you are free to use Permission Server in any project whether open source, free, or commercial. For further details [see here](./LICENSE.txt).*
 
-## Licensing details
+- If you are just *using* Permission Server within a larger project you're fine
+- If you *change* Permission Server or offer it wrapped up as a *networked service* (eg as a cloud offering) then you need to read the license
 
-*Being licensed under the [AGPL](./LICENSE.txt) you are free to use Permission Server in any project whether open source, free, or commercial. For further clarity see here.*
+---
 
-There is no requirement to share your own project's code.  You need to share any changes you make to Permission Server itself, and the AGPL won't let you run Permission Server as a stand-alone cloud-based tool. Again, though, there's no restrictions at all on what you do with your own stuff that you add Permission Server into; that's none of my business. If in doubt read the license, but generally unless you are changing Permission Server or wanting to run Permission Server as a stand-alone online service there's nothing to worry about.
+## Using Permission Server in your code
+
+The publicly available methods and models are kept deliberately simple. After all, one of the main reasons you might choose to use Permission Server is to avoid all the complexity that comes with a full user management system.
+
+In essence you have a class for interacting with tokens and emails, a class for options, and an extention method to help you register it all.
+
+*There is also a sample MVC website in the Permission Server source code repository.*
+
+### Registering Permission Server into your application's dependency container
+
+The below code configures and registers Permission Server and it's dependencies so you can then inject it into your controllers or services as required (it's an extention method on `IServiceCollection`).  In the background it also sets up its token store and emailing system.
+
+`Program.cs`
+
+``` csharp
+using static PermissionServer.PermissionServerOptions;
+// ...
+public static void Main(string[] args)
+{
+    // ...
+    var options = new PermissionServerOptions
+    {
+        Tokens = new TokenOptions
+        {
+            Length = 8,
+            LifetimeMinutes = 15,
+            SingleUse = true,
+        },
+        Emails = new EmailOptions
+        {
+            Hostname = "smtp.email-provider.com",
+            Port = 587,
+            StartTLS = true,
+            Username = "email-account-username",
+            Password = "email-account-password",
+            Sender = "Sample App <no-reply@email-provider.com>",
+        },
+    };
+
+    builder.Services.AddPermissionServer(options);
+    // ...
+}
+```
+
+### Issuing and confirming an email address via an emailed token
+
+- Your code needs to provide Permission Server an email address and the URL that the email directs the user to.
+In the background a token will be generated and a confirmation request email sent.
+- When the user clicks that link and comes back into your code you then need to pass Permission Server the email address plus the confirmation code that the user obtains from within their confirmation email. Permission Server will then confirm that the confirmation code is one that is correct, current, and issued for that email address.
+- With just two methods you've got proof that the user has access to the email address, leaving you free to either create an account or sign them in to an existing one based on that confirmation.
+
+`AccountController.cs` (for example)
+
+``` csharp
+using PermissionServer;
+// ...
+private readonly PermissionServer.PermissionServer permissionServer;
+
+public AccountController(PermissionServer.PermissionServer permissionServer)
+{
+    this.permissionServer = permissionServer;
+}
+
+[HttpGet]
+[Route("/login")]
+public async Task<IActionResult> Login() => View();
+
+[HttpPost]
+[Route("/send-confirmation")]
+public async Task<IActionResult> SendConfirmation(LoginRequest model)
+{
+    // ...
+    var confirmUrl = $"{Request.Scheme}://{Request.Host}/{nameof(Confirm)}";
+    await permissionServer.StartConfirmation(model.EmailAddress, confirmUrl);
+    // ...
+}
+
+[HttpGet]
+[Route("/confirm")]
+public async Task<IActionResult> Confirm() => View();
+
+[HttpPost]
+[Route("/confirm")]
+public async Task<IActionResult> ConfirmPost(ConfirmationRequest model)
+{
+    // ...
+    var status = permissionServer.CompleteConfirmation(model.EmailAddress, model.ConfirmationCode);
+    if (status == ConfirmationStatus.Okay)
+    {
+        // Email account access has been confirmed.
+    } else {
+        // There was an issue with the confirmation.
+        // The `status` will indicate what.
+    }
+    // ...
+}
+```
+
+The `ConfirmationStatus` enumeration has the values `Unknown`, `Okay`, `NoTokenFound`, `DoesNotMatchToken`, or `HasExpired`.
+
+It's not shown here, but as usual you should add data annotations to your POST models and check the ModelState. Permission Server verifies tokens but beyond that there are no checks; the first you'll know about a bad email address for example is when it fails to send.
+
+## About the sample MVC site
+
+The most common scenario is an MVC website, so there's an example in the Permission Server source code repository.
+Here's a few pointers on where to look and what to look for.
+
+*You should read the following with the sample site code also open.*
+
+**Permission Server is registered in the `Program.cs` file.**
+
+In there you'll see the configuration and registration as mentioned higher up.  What you'll also see is it switches on cookie-based session authentication.  This provides automatic support for the `[Authorize]` attribute on controller endpoints (provided you sign the user in/out within your controllers etc).
+
+It also sets the `LoginPath` in the cookie config. By default dotnet redirects unauthenticated users visiting protected pages to `/account/login`, but I prefer the simpler `/login` route instead and this option updates the cookie authentication flow accordingly.
+
+**Signing in and out via emailed confirmation codes is done in the `Controllers/AccountController.cs` file.**
+
+The constructor asks for an injected instance of the `PermissionServer` class.
+There are two main aspects - providing the user with a token and then confirming it later on.  Each aspect has a GET and a POST where the GETs (`Login` and `Confirm`) present a view to gather information and the POSTs (`SendConfirmation` and `ConfirmPost`) make use of that information.
+
+The `SendConfirmation` endpoint is given an email address by the user. It composes a confirmation URL and gets Permission Server to generate the confirmation code and email it out.  It also signs the user out (personal preference; this is optional).
+
+The `ConfirmPost` endpoint is again given an email address by the user but this time accompanied by the confirmation code obtained by reading that email.  If everything matches the user is signed in.  There are example claims added in at that point but obviously that's entirely down to you and how your application works.
+
+For completeness there's a `Logout` endpoint too but that's a concern of the application itself and nothing to do with Permission Server.
+
+**Suitable views exist within `Views/Account` for starting and finishing the confirmation flow**
+
+These views are for the `AccountController` endpoints just described.  They are simple and obvious, and are nothing to do with Permission Server itself. They either show the forms for taking the user login/confirm input, or they display the outcome of processing that input.
+
+**The `Views/Shared/_Layout.cshtml` site layout has been updated**
+
+Again, this is nothing to do with Permission Server itself but is included in case it's helpful.
+At the top of the view the current user and login status is assessed.
+In the navigation area the menu links are shown or hidden accordingly.
+And in the `<main>` area the currently signed-in user is shown before the content is rendered.
+
+**A stub dashboard page has been added to show a protected page in use**
+
+This involves a new endpoint in `Controllers/HomeController.cs` and a related `Views/Home/Dashboard.cshtml`.  Both are virtually empty; the only point is to show the `[Authorize]` attribute protecting the page.
 
 ---
 

@@ -9,7 +9,7 @@ namespace PermissionServer
         private readonly ITokenStore tokenStore;
         private readonly Mailer mailer;
 
-        public PermissionServer(
+        internal PermissionServer(
             PermissionServerOptions options,
             ITokenStore tokenStore,
             Mailer mailer)

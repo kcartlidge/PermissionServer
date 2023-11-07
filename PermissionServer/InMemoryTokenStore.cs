@@ -5,7 +5,7 @@ using static PermissionServer.PermissionServerOptions;
 namespace PermissionServer
 {
     /// <inheritdoc/>
-    public class InMemoryTokenStore : ITokenStore
+    internal class InMemoryTokenStore : ITokenStore
     {
         private readonly TokenOptions opts;
         private readonly Dictionary<string, Token> tokens;
