@@ -18,10 +18,7 @@ namespace SampleSite.Controllers
 
         [HttpGet]
         [Route("/login")]
-        public async Task<IActionResult> Login()
-        {
-            return View();
-        }
+        public async Task<IActionResult> Login() => View();
 
         [HttpPost]
         [Route("/send-confirmation")]
@@ -33,12 +30,15 @@ namespace SampleSite.Controllers
                 {
                     // Start the confirmation process.
                     var confirmUrl = $"{Request.Scheme}://{Request.Host}/{nameof(Confirm)}";
-                    await permissionServer.StartConfirmation(model.EmailAddress, confirmUrl);
-
-                    // Always sign out if successfully starting a login attempt.
-                    await Request.HttpContext.SignOutAsync();
-                    await HttpContext.SignOutAsync();
-                    return RedirectToAction(nameof(HomeController.Index), "home");
+                    var added = await permissionServer.StartConfirmation(model.EmailAddress, confirmUrl);
+                    if (added)
+                    {
+                        // Always sign out if successfully starting a login attempt.
+                        await Request.HttpContext.SignOutAsync();
+                        await HttpContext.SignOutAsync();
+                        return RedirectToAction(nameof(HomeController.Index), "home");
+                    }
+                    ModelState.AddModelError("", "Too many attempts; please wait a while and try again.");
                 }
                 catch
                 {
@@ -50,10 +50,7 @@ namespace SampleSite.Controllers
 
         [HttpGet]
         [Route("/confirm")]
-        public async Task<IActionResult> Confirm()
-        {
-            return View();
-        }
+        public async Task<IActionResult> Confirm() => View();
 
         [HttpPost]
         [Route("/confirm")]
@@ -61,8 +58,8 @@ namespace SampleSite.Controllers
         {
             if (ModelState.IsValid)
             {
-                var status = permissionServer.CompleteConfirmation(model.EmailAddress, model.ConfirmationCode);
-                if (status == ConfirmationStatus.Okay)
+                var matched = permissionServer.CompleteConfirmation(model.EmailAddress, model.ConfirmationCode);
+                if (matched)
                 {
                     // At this point the site's own systems should be checked for
                     // a matching account now the email address has been confirmed.

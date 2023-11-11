@@ -12,7 +12,11 @@ namespace PermissionServer
 
         public string ConfirmationCode { get; }
 
+        /// <summary>Returns true if the token has expired.</summary>
         public bool IsExpired => ValidUntil < DateTime.UtcNow;
+
+        /// <summary>Returns true if the token hasn't expired.</summary>
+        public bool IsActive => IsExpired == false;
 
         /// <summary>
         /// Creates a token with the specified length and lifetime.
@@ -45,14 +49,6 @@ namespace PermissionServer
                 ConfirmationCode,
                 suggestedConfirmationCode.Trim(),
                 StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Returns true if the token hasn't expired.
-        /// </summary>
-        public bool IsActive(string suggestedValidationCode)
-        {
-            return IsExpired == false;
         }
 
         private string GetTokenString(int tokenDigits)

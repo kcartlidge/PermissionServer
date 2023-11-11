@@ -34,19 +34,19 @@ Add email-based sign-up/login to your site/app with minimal effort!
 - Email address confirmation
   - Suitable for account creation or login
 - Auto-expiring tokens (configurable lifetime)
+- Multiple active tokens in case of email issues
+  - Maximum active per email is configurable
 - Minimal supporting code required
 - No database needed
 
 Potential future features:
 
-- Optional: multiple active tokens
 - Optional: database token storage
 - Optional: full accounts management
 
 ### Overview
 
-The hardest details to steal from your systems are those that you never stored in the first place.
-With Permission Server you get the reassurance of confirmed email addresses for both account creation and login, but without the need to store passwords, security questions, or other high-value data.
+The hardest details to steal from your systems are those that you never stored in the first place. With Permission Server you get the reassurance of confirmed email addresses for both account creation and login, but without the need to store passwords, security questions, or other high-value data.
 
 Reduce your risk and, for many apps/sites, your overheads too due to the ability to skip a database.
 
@@ -54,7 +54,7 @@ Reduce your risk and, for many apps/sites, your overheads too due to the ability
 
 - Your app/site asks for an email address
 - Permission Server generates a token and emails it to the user
-  - The user signs into their email (the email provider is indirectly applying security *for* you)
+  - The user signs into their email (which means the email provider is indirectly applying security *for* you)
   - The user reads your email, copies the token, and clicks a link back to your site
 - Your app/site has a confirmation screen/page asking for the email address and token
 - Permission Server validates the token is a match and has not expired
@@ -134,7 +134,7 @@ In essence you have a class for interacting with tokens and emails, a class for 
 
 ### Registering Permission Server into your application's dependency container
 
-The below code configures and registers Permission Server and it's dependencies so you can then inject it into your controllers or services as required (it's an extention method on `IServiceCollection`).  In the background it also sets up its token store and emailing system.
+The below code configures and registers Permission Server and it's dependencies so you can then inject it into your controllers or services as required.  This uses an extention method on `IServiceCollection`.  In the background it also sets up its token store and emailing system.
 
 `Program.cs`
 
@@ -151,6 +151,7 @@ public static void Main(string[] args)
             Length = 8,
             LifetimeMinutes = 15,
             SingleUse = true,
+            MaximumActivePerKey = 5,
         },
         Emails = new EmailOptions
         {
@@ -170,8 +171,7 @@ public static void Main(string[] args)
 
 ### Issuing and confirming an email address via an emailed token
 
-- Your code needs to provide Permission Server an email address and the URL that the email directs the user to.
-In the background a token will be generated and a confirmation request email sent.
+- Your code needs to provide Permission Server an email address and the URL that the email directs the user to. In the background a token will be generated and a confirmation request email sent.
 - When the user clicks that link and comes back into your code you then need to pass Permission Server the email address plus the confirmation code that the user obtains from within their confirmation email. Permission Server will then confirm that the confirmation code is one that is correct, current, and issued for that email address.
 - With just two methods you've got proof that the user has access to the email address, leaving you free to either create an account or sign them in to an existing one based on that confirmation.
 
@@ -197,7 +197,15 @@ public async Task<IActionResult> SendConfirmation(LoginRequest model)
 {
     // ...
     var confirmUrl = $"{Request.Scheme}://{Request.Host}/{nameof(Confirm)}";
-    await permissionServer.StartConfirmation(model.EmailAddress, confirmUrl);
+    var added = await permissionServer.StartConfirmation(model.EmailAddress, confirmUrl);
+    if (added)
+    {
+        // The user has signed in okay.
+    } else {
+        // If no token was added then the MaximumActivePerKey has been reached.
+        // The user is trying too often and needs to wait for their oldest active
+        // attempt to expire before they get another go.
+    }
     // ...
 }
 
@@ -210,19 +218,17 @@ public async Task<IActionResult> Confirm() => View();
 public async Task<IActionResult> ConfirmPost(ConfirmationRequest model)
 {
     // ...
-    var status = permissionServer.CompleteConfirmation(model.EmailAddress, model.ConfirmationCode);
-    if (status == ConfirmationStatus.Okay)
+    var matched = permissionServer.CompleteConfirmation(model.EmailAddress, model.ConfirmationCode);
+    if (matched)
     {
         // Email account access has been confirmed.
     } else {
         // There was an issue with the confirmation.
-        // The `status` will indicate what.
+        // It may be incorrect, expired, or already used.
     }
     // ...
 }
 ```
-
-The `ConfirmationStatus` enumeration has the values `Unknown`, `Okay`, `NoTokenFound`, `DoesNotMatchToken`, or `HasExpired`.
 
 It's not shown here, but as usual you should add data annotations to your POST models and check the ModelState. Permission Server verifies tokens but beyond that there are no checks; the first you'll know about a bad email address for example is when it fails to send.
 

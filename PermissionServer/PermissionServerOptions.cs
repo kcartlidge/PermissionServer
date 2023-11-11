@@ -11,6 +11,7 @@ namespace PermissionServer
             public int Length { get; set; } = 8;
             public int LifetimeMinutes { get; set; } = 15;
             public bool SingleUse { get; set; } = true;
+            public int MaximumActivePerKey { get; set; } = 1;
         }
 
         public class EmailOptions

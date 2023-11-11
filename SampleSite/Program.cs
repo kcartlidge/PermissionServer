@@ -34,6 +34,7 @@ namespace SampleSite
                     Length = 8,
                     LifetimeMinutes = 15,
                     SingleUse = true,
+                    MaximumActivePerKey = 5,
                 },
                 Emails = new EmailOptions
                 {

@@ -8,7 +8,7 @@ namespace PermissionServer
     internal class InMemoryTokenStore : ITokenStore
     {
         private readonly TokenOptions opts;
-        private readonly Dictionary<string, Token> tokens;
+        private readonly List<(string Key, Token Token)> keyedTokens;
 
         /// <summary>
         /// Creates a new token store.
@@ -21,59 +21,64 @@ namespace PermissionServer
         /// </summary>
         public InMemoryTokenStore(TokenOptions tokenOptions)
         {
-            tokens = new();
+            keyedTokens = new();
             opts = tokenOptions;
         }
 
         /// <inheritdoc/>
-        public Token Add(string key)
+        public Token? Add(string key)
         {
             Purge();
             key = NormalisedKey(key);
-            lock (tokens)
+            lock (keyedTokens)
             {
-                Remove(key);
+                var existing = keyedTokens.Count(x => x.Key == key && x.Token.IsActive);
+                if (existing >= opts.MaximumActivePerKey) return null;
+
                 var token = new Token(opts.Length, opts.LifetimeMinutes);
-                tokens.Add(key, token);
+                keyedTokens.Add((key, token));
                 return token;
             }
         }
 
         /// <inheritdoc/>
-        public Token? Get(string key)
+        public Token? Get(string key, string confirmationCode)
         {
             key = NormalisedKey(key);
-            lock (tokens)
+            lock (keyedTokens)
             {
-                if (tokens.ContainsKey(key) == false) return null;
-                var token = tokens[key];
-                if (token.IsExpired)
+                foreach (var token in keyedTokens.Where(x => x.Key == key))
                 {
-                    Remove(key);
-                    return null;
+                    if (token.Token.IsExpired) continue;
+                    if (token.Token.Matches(confirmationCode)) return token.Token;
                 }
-                return token;
+                return null;
             }
         }
 
         /// <inheritdoc/>
-        public void Remove(string key)
+        public void Remove(string key, string confirmationCode)
         {
             key = NormalisedKey(key);
-            lock (tokens)
+            lock (keyedTokens)
             {
-                if (tokens.ContainsKey(key) == false) return;
-                tokens.Remove(key);
+                for (var i = keyedTokens.Count - 1; i >= 0; i--)
+                {
+                    if (keyedTokens[i].Key != key) continue;
+                    if (keyedTokens[i].Token.Matches(confirmationCode))
+                        keyedTokens.RemoveAt(i);
+                }
             }
         }
 
         /// <inheritdoc/>
         public void Purge()
         {
-            lock (tokens)
+            lock (keyedTokens)
             {
-                foreach (var token in tokens.Where(x => x.Value.IsExpired).ToList())
-                    tokens.Remove(token.Key);
+                for (var i = keyedTokens.Count - 1; i >= 0; i--)
+                    if (keyedTokens[i].Token.IsExpired)
+                        keyedTokens.RemoveAt(i);
             }
         }
 

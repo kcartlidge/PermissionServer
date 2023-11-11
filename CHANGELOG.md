@@ -1,5 +1,9 @@
 # CHANGELOG
 
+- v0.2.2
+  - Multiple active tokens per key
+    - Support an upper limit
+
 - v0.2.1
   - Update README file
   - Reduce visibility of some publics
