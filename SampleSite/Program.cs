@@ -45,6 +45,14 @@ namespace SampleSite
                     Username = "[FILL ME IN]",
                     Password = "[FILL ME IN]",
                     Sender = "Sample App <[FILL ME IN]>",
+                    AppName = "Sample App",
+                    Subject = "{AppName} email confirmation",
+                    Body =
+                        "To confirm this email please visit:  {URL}\n" +
+                        "Once there enter confirmation code:  {ConfirmationCode}\n\n" +
+                        "This code is valid for {LifetimeMinutes} minutes from when the email was issued.\n" +
+                        "Sent to {Recipient} and valid until {ValidUntil} (UTC/GMT). " +
+                        "If this was not requested you may safely ignore this email.",
                 },
             };
             builder.Services.AddPermissionServer(psOpts);

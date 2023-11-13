@@ -26,11 +26,23 @@ namespace PermissionServer
             Token token,
             string url)
         {
-            var subject = $"{opts.AppName} login details";
-            var body =
-                $"Enter the code {token.ConfirmationCode} at {url} to sign in.\n" +
-                $"This code is valid for {token.LifetimeMinutes} minutes from when the email was sent.";
-            return SendEmail(recipient, subject, body);
+            return SendEmail(
+                recipient,
+                DoReplacements(opts.Subject, recipient, token, url),
+                DoReplacements(opts.Body, recipient, token, url)
+            );
+        }
+
+        private string DoReplacements(string text, string recipient, Token token, string url)
+        {
+            return text
+                .Replace("{AppName}", opts.AppName)
+                .Replace("{Recipient}", recipient)
+                .Replace("{ConfirmationCode}", token.ConfirmationCode)
+                .Replace("{LifetimeMinutes}", token.LifetimeMinutes.ToString())
+                .Replace("{ValidUntil}", token.ValidUntil.ToString("f"))
+                .Replace("{URL}", url)
+                .Trim();
         }
 
         private async Task<(bool OK, string ErrorMessage)> SendEmail(

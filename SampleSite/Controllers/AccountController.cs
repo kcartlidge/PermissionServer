@@ -81,7 +81,7 @@ namespace SampleSite.Controllers
                 {
                     ModelState.AddModelError(
                         nameof(model.ConfirmationCode),
-                        "The token is not valid, has expired, or has already been used - please recheck your email.");
+                        "The confirmation code is not valid, has expired, or has already been used - please recheck your email.");
                 }
             }
             return View(nameof(Confirm));

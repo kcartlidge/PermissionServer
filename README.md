@@ -6,8 +6,6 @@ Add email-based sign-up/login to your site/app with minimal effort!
 
 *Licensed under the [AGPL](./LICENSE.txt), you are free to use Permission Server in any project whether open source, free, or commercial. For further details [see here](./LICENSE.txt).*
 
-**[Status:](./CHANGELOG.md)** Alpha - working but not feature-complete
-
 *Copyright 2023 K Cartlidge.*
 
 ## Contents
@@ -18,6 +16,7 @@ Add email-based sign-up/login to your site/app with minimal effort!
 - [Overview](#overview)
 - [Concerns](#concerns)
 - [License](#license)
+- [Changelog](./CHANGELOG.md)
 
 [Using Permission Server in your code](#using-permission-server-in-your-code)
   - [Registering Permission Server into your application's dependency container](#registering-permission-server-into-your-applications-dependency-container)
@@ -42,7 +41,7 @@ Add email-based sign-up/login to your site/app with minimal effort!
 Potential future features:
 
 - Optional: database token storage
-- Optional: full accounts management
+- Optional: full account management
 
 ### Overview
 
@@ -160,7 +159,16 @@ public static void Main(string[] args)
             StartTLS = true,
             Username = "email-account-username",
             Password = "email-account-password",
+
+            AppName = "Sample App",
             Sender = "Sample App <no-reply@email-provider.com>",
+            Subject = "{AppName} email confirmation",
+            Body =
+                "To confirm this email please visit:  {URL}\n" +
+                "Once there enter confirmation code:  {ConfirmationCode}\n\n" +
+                "This code is valid for {LifetimeMinutes} minutes from when the email was issued.\n" +
+                "Sent to {Recipient} and valid until {ValidUntil} (UTC/GMT). " +
+                "If this was not requested you may safely ignore this email.",
         },
     };
 
@@ -168,6 +176,17 @@ public static void Main(string[] args)
     // ...
 }
 ```
+
+Note that the `Subject` and `Body` in the configuration above are templates which can include placeholders. Those placeholders are enclosed in curly braces (`{placeholder}`) and are substituted with the related values as emails are being generated.
+
+| Placeholder | Value |
+| ----------- | ----- |
+| `{AppName}` | The `AppName` provided during configuration |
+| `{Recipient}` | The full recipient of the email address (eg `dave <dave@example.com>`) |
+| `{ConfirmationCode}` | The generated confirmation code for the user to enter |
+| `{LifetimeMinutes}` | How many minutes the confirmation code is valid for |
+| `{ValidUntil}` | When the confirmation code expires (in UTC/GMT not local time) |
+| `{URL}` | Where your app expects the user to enter the confirmation code |
 
 ### Issuing and confirming an email address via an emailed token
 

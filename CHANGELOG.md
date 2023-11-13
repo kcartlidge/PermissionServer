@@ -1,5 +1,8 @@
 # CHANGELOG
 
+- v1.0.0
+  - Custom confirmation email template
+
 - v0.2.2
   - Multiple active tokens per key
     - Support an upper limit

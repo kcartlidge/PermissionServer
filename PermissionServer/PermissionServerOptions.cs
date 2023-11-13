@@ -1,3 +1,5 @@
+using System;
+
 namespace PermissionServer
 {
     /// <summary>Defines the behaviour of Permission Server.</summary>
@@ -23,6 +25,14 @@ namespace PermissionServer
             public string Username { get; set; } = "";
             public string Password { get; set; } = "";
             public string Sender { get; set; } = "";
+
+            public string Subject { get; set; } = "{AppName} email confirmation";
+            public string Body { get; set; } =
+                "To confirm this email please visit:  {URL}\n" +
+                "Once there enter confirmation code:  {ConfirmationCode}\n\n" +
+                "This code is valid for {LifetimeMinutes} minutes from when the email was issued.\n" +
+                "Sent to {Recipient} and valid until {ValidUntil} (UTC/GMT). " +
+                "If this was not requested you may safely ignore this email.";
         }
     }
 }
