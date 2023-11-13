@@ -3,6 +3,7 @@
 - v1.0.0
   - Custom confirmation email template
   - Add Nuget package definition
+  - Stub web page with links
 
 - v0.2.2
   - Multiple active tokens per key
