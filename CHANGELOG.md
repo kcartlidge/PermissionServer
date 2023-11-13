@@ -2,6 +2,7 @@
 
 - v1.0.0
   - Custom confirmation email template
+  - Add Nuget package definition
 
 - v0.2.2
   - Multiple active tokens per key
