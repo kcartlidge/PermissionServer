@@ -1,4 +1,4 @@
-# PERMISSION SERVER
+# PERMISSION-SERVER
 
 DotNet Nuget package providing password-less authentication with auto-expiring tokens (in an in-memory store; no database required) and confirmation emails.
 
