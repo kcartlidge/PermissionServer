@@ -219,7 +219,7 @@ public async Task<IActionResult> SendConfirmation(LoginRequest model)
     var added = await permissionServer.StartConfirmation(model.EmailAddress, confirmUrl);
     if (added)
     {
-        // The user has signed in okay.
+        // A token was created and the user has been emailed the confirmation code.
     } else {
         // If no token was added then the MaximumActivePerKey has been reached.
         // The user is trying too often and needs to wait for their oldest active
@@ -249,7 +249,36 @@ public async Task<IActionResult> ConfirmPost(ConfirmationRequest model)
 }
 ```
 
-It's not shown here, but as usual you should add data annotations to your POST models and check the ModelState. Permission Server verifies tokens but beyond that there are no checks; the first you'll know about a bad email address for example is when it fails to send.
+You should add data annotations to your POST models and check the ModelState. Permission Server verifies tokens but beyond that there are no checks; the first you'll know about a bad email address for example is when it fails to send.
+
+Here are the example models used above:
+
+``` csharp
+using System.ComponentModel.DataAnnotations;
+
+namespace Models.RequestModels
+{
+    public class LoginRequest
+    {
+        [Required(ErrorMessage = "You must enter an email address.")]
+        [StringLength(200, MinimumLength = 6, ErrorMessage = "The email address must be between 6 and 200 characters.")]
+        public string EmailAddress { get; set; } = "";
+    }
+
+    public class ConfirmationRequest
+    {
+        [Required(ErrorMessage = "You must enter an email address.")]
+        [StringLength(200, MinimumLength = 6, ErrorMessage = "The email address must be between 6 and 200 characters.")]
+        public string EmailAddress { get; set; } = "";
+
+        [Required(ErrorMessage = "A confirmation code is required - check your email and try again.")]
+        [StringLength(64, MinimumLength = 5, ErrorMessage = "The confirmation code is not in the expected format - check your email and try again.")]
+        public string ConfirmationCode { get; set; } = "";
+    }
+}
+```
+
+For more complete details see the sample MVC site.
 
 ## About the sample MVC site
 
@@ -260,7 +289,7 @@ Here's a few pointers on where to look and what to look for.
 
 **Permission Server is registered in the `Program.cs` file.**
 
-In there you'll see the configuration and registration as mentioned higher up.  What you'll also see is it switches on cookie-based session authentication.  This provides automatic support for the `[Authorize]` attribute on controller endpoints (provided you sign the user in/out within your controllers etc).
+In there you'll see the configuration and registration as mentioned higher up.  What you'll also see is it **switches on cookie-based session authentication**.  This provides automatic support for the `[Authorize]` attribute on controller endpoints (provided you sign the user in/out within your controllers etc).
 
 It also sets the `LoginPath` in the cookie config. By default dotnet redirects unauthenticated users visiting protected pages to `/account/login`, but I prefer the simpler `/login` route instead and this option updates the cookie authentication flow accordingly.
 

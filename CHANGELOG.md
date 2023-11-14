@@ -1,5 +1,9 @@
 # CHANGELOG
 
+- v1.0.1
+  - Small documentation fixes
+  - Include request models in README
+
 - v1.0.0
   - Custom confirmation email template
   - Add Nuget package definition

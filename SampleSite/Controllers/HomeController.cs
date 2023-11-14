@@ -20,8 +20,6 @@ namespace SampleSite.Controllers
         }
 
         // Sample protected page.
-        // MVC will automatically redirect this route to a login page, but
-        // that doesn't yet exist so it shows a 404 rather than a view.
         [Authorize()]
         public IActionResult Dashboard()
         {
