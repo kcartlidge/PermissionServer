@@ -4,6 +4,8 @@ DotNet Nuget package providing password-less authentication with auto-expiring t
 
 Add email-based sign-up/login to your site/app with minimal effort!
 
+[The Nuget package is available here](https://www.nuget.org/packages/Permission-Server).
+
 *Licensed under the [AGPL](./LICENSE.txt), you are free to use Permission Server in any project whether open source, free, or commercial. For further details [see here](./LICENSE.txt).*
 
 *Copyright 2023 K Cartlidge.*
