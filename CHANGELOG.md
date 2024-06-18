@@ -1,5 +1,11 @@
 # CHANGELOG
 
+- v1.2.0
+  - Returns false when `StartConfirmation` fails to send an email
+    - Previously only returned false for failures to generate
+    - The two cases are deliberately *not* distinguished between
+      - This is because changing behaviour based on this is a security risk
+
 - v1.1.0
   - NetStandard library
   - Cleared some warnings

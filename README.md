@@ -239,6 +239,8 @@ public async Task<IActionResult> SendConfirmation(LoginRequest model)
         // If no token was added then the MaximumActivePerKey has been reached.
         // The user is trying too often and needs to wait for their oldest active
         // attempt to expire before they get another go.
+        // It may also be the case that sending the email failed. We do not get
+        // a separate error as advising the user which it is can be a security risk.
     }
     // ...
 }

@@ -37,7 +37,7 @@ namespace SampleSite.Controllers
                         await HttpContext.SignOutAsync();
                         return RedirectToAction(nameof(HomeController.Index), "home");
                     }
-                    ModelState.AddModelError("", "Too many attempts; please wait a while and try again.");
+                    ModelState.AddModelError("", "Either the email address is invalid or there have been too many attempts (please wait a while and try again).");
                 }
                 catch
                 {

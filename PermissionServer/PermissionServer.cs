@@ -19,7 +19,12 @@ namespace PermissionServer
             this.mailer = mailer;
         }
 
-        /// <summary>Generates a new limited-lifetime token and emails it.</summary>
+        /// <summary>
+        /// Generates a new limited-lifetime token and emails it.
+        /// A return value of false can mean EITHER the failure to create and
+        /// store a token OR the failure to send it. For security reasons the
+        /// specifics are NOT returned as the end user should never be told.
+        /// </summary>
         public async Task<bool> StartConfirmation(string emailAddress, string confirmationUrl)
         {
             var token = tokenStore.Add(emailAddress);
@@ -28,6 +33,7 @@ namespace PermissionServer
             if (!ok)
             {
                 Console.WriteLine($"Error sending email to {emailAddress} => {error}");
+                return false;
             }
             return true;
         }
