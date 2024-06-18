@@ -1,5 +1,3 @@
-using System;
-
 namespace PermissionServer
 {
     /// <summary>Defines the behaviour of Permission Server.</summary>

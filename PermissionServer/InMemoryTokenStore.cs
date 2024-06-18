@@ -21,7 +21,7 @@ namespace PermissionServer
         /// </summary>
         public InMemoryTokenStore(TokenOptions tokenOptions)
         {
-            keyedTokens = new();
+            keyedTokens = new List<(string Key, Token Token)> ();
             opts = tokenOptions;
         }
 

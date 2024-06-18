@@ -1,5 +1,12 @@
 # CHANGELOG
 
+- v1.1.0
+  - NetStandard library
+  - Cleared some warnings
+  - Slight documentation updates
+  - Mermaid flow diagram
+  - Better sample site text
+
 - v1.0.1
   - Small documentation fixes
   - Include request models in README

@@ -1,4 +1,4 @@
-using PermissionServer;
+using System;
 using System.Threading.Tasks;
 
 namespace PermissionServer
@@ -24,7 +24,11 @@ namespace PermissionServer
         {
             var token = tokenStore.Add(emailAddress);
             if (token == null) return false;
-            await mailer.SendConfirmation(emailAddress, token, confirmationUrl);
+            (var ok, var error) = await mailer.SendConfirmation(emailAddress, token, confirmationUrl);
+            if (!ok)
+            {
+                Console.WriteLine($"Error sending email to {emailAddress} => {error}");
+            }
             return true;
         }
 

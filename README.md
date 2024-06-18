@@ -10,6 +10,8 @@ Add email-based sign-up/login to your site/app with minimal effort!
 
 *Copyright 2023 K Cartlidge.*
 
+---
+
 ## Contents
 
 [General](#general)
@@ -21,6 +23,7 @@ Add email-based sign-up/login to your site/app with minimal effort!
 - [Changelog](./CHANGELOG.md)
 
 [Using Permission Server in your code](#using-permission-server-in-your-code)
+  - [Flow diagram](#flow-diagram)
   - [Registering Permission Server into your application's dependency container](#registering-permission-server-into-your-applications-dependency-container)
   - [Issuing and confirming an email address via an emailed token](#issuing-and-confirming-an-email-address-via-an-emailed-token)
 
@@ -133,6 +136,16 @@ In essence you have a class for interacting with tokens and emails, a class for 
 
 *There is also a sample MVC website in the Permission Server source code repository.*
 
+### Flow diagram
+
+The [mermaid source for this diagram](./flow.mermaid) is in this repository.
+
+*You'll see by looking at the column labelled `APPLICATION` that your code has very little work to do, mostly comprising passing information between your user and Permission Server*.
+
+The exception is that *optionally* you can maintain your own application-level accounts system to apply further restrictions safe in the knowledge the user has confirmed the email address.
+
+![Flow Diagram](./flow.png)
+
 ### Registering Permission Server into your application's dependency container
 
 The below code configures and registers Permission Server and it's dependencies so you can then inject it into your controllers or services as required.  This uses an extention method on `IServiceCollection`.  In the background it also sets up its token store and emailing system.
@@ -210,7 +223,7 @@ public AccountController(PermissionServer.PermissionServer permissionServer)
 
 [HttpGet]
 [Route("/login")]
-public async Task<IActionResult> Login() => View();
+public IActionResult Login() => View();
 
 [HttpPost]
 [Route("/send-confirmation")]
@@ -232,7 +245,7 @@ public async Task<IActionResult> SendConfirmation(LoginRequest model)
 
 [HttpGet]
 [Route("/confirm")]
-public async Task<IActionResult> Confirm() => View();
+public IActionResult Confirm() => View();
 
 [HttpPost]
 [Route("/confirm")]
@@ -283,6 +296,12 @@ namespace Models.RequestModels
 For more complete details see the sample MVC site.
 
 ## About the sample MVC site
+
+> You will need to add email server credentials to `Program.cs` first.
+Complete ALL the fields saying `[FILL ME IN]`.
+The other settings are already suitable for a free email service for developers that's designed for just this type of thing.
+
+> For this example (and most sites using Permission Server) there is no need to create an account. Logging in confirms the email address so an account can be transparently created in the background, meaning sign-up and login are the same thing (though you may choose to have different flows in your UI for user clarity).
 
 The most common scenario is an MVC website, so there's an example in the Permission Server source code repository.
 Here's a few pointers on where to look and what to look for.

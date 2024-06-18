@@ -1,0 +1,20 @@
+participant USER as U
+participant APPLICATION\n(your code) as A
+participant PERMISSION\nSEVER as PS
+participant USER\nEMAIL as E
+
+Note over U: Request
+U -> A   : abc@example.com
+A -> PS  : abc@example.com
+Note over PS: Creates Token
+PS -> E  : 12345678
+PS --> A :
+A --> U  : ""Check Email""
+
+Note over U: Confirm
+U -> A   : abc@example.com\n12345678
+A -> PS  : abc@example.com\n12345678
+Note over PS: Confirms Token
+PS --> A :
+Note over A: Optional\nApplication\nAccounts
+A --> U  : Session Cookie\n(for example)

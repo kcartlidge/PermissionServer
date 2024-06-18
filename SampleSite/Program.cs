@@ -39,6 +39,7 @@ namespace SampleSite
                 Emails = new EmailOptions
                 {
                     // Example dev-suitable online email system.
+                    // Register at https://ethereal.email (free).
                     Hostname = "smtp.ethereal.email",
                     Port = 587,
                     StartTLS = true,

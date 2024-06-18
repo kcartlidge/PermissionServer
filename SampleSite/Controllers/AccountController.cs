@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using PermissionServer;
 using SampleSite.Models.RequestModels;
 
 namespace SampleSite.Controllers
@@ -18,7 +17,7 @@ namespace SampleSite.Controllers
 
         [HttpGet]
         [Route("/login")]
-        public async Task<IActionResult> Login() => View();
+        public IActionResult Login() => View();
 
         [HttpPost]
         [Route("/send-confirmation")]
@@ -50,7 +49,7 @@ namespace SampleSite.Controllers
 
         [HttpGet]
         [Route("/confirm")]
-        public async Task<IActionResult> Confirm() => View();
+        public IActionResult Confirm() => View();
 
         [HttpPost]
         [Route("/confirm")]
