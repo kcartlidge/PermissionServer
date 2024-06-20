@@ -1,5 +1,13 @@
 # CHANGELOG
 
+- v1.3.0
+  - Supports provision of a `Context` for a verification flow
+  - The value should be provided at Start and Confirm
+  - This increases security by insisting on some session commonality, for example:
+    - The same IP address implies Start and Confirm were actioned from the same location
+    - The same browser fingerprint implies Start and Confirm were actioned from the same browser
+    - The same session id implies Start and Confirm were actioned from the same browser session
+
 - v1.2.0
   - Returns false when `StartConfirmation` fails to send an email
     - Previously only returned false for failures to generate

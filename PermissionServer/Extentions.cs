@@ -16,5 +16,13 @@ namespace PermissionServer
             var permissionServer = new PermissionServer(options, tokenStore, mailer);
             services.AddSingleton(permissionServer);
         }
+
+        /// <summary>
+        /// Returns true if the value is not null or whitespace.
+        /// </summary>
+        internal static bool HasValue(this string value)
+        {
+            return !string.IsNullOrWhiteSpace(value);
+        }
     }
 }

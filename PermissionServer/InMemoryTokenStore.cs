@@ -18,15 +18,16 @@ namespace PermissionServer
         /// down (and hence invalidate) all tokens.
         /// The only impact is tokens which are in-flight (such as an email
         /// sent but whose verification link has not yet been clicked).
+        /// The user's browser session etc won't be impacted.
         /// </summary>
         public InMemoryTokenStore(TokenOptions tokenOptions)
         {
-            keyedTokens = new List<(string Key, Token Token)> ();
+            keyedTokens = new List<(string Key, Token Token)>();
             opts = tokenOptions;
         }
 
         /// <inheritdoc/>
-        public Token? Add(string key)
+        public Token? Add(string key, string context = "")
         {
             Purge();
             key = NormalisedKey(key);
@@ -35,22 +36,22 @@ namespace PermissionServer
                 var existing = keyedTokens.Count(x => x.Key == key && x.Token.IsActive);
                 if (existing >= opts.MaximumActivePerKey) return null;
 
-                var token = new Token(opts.Length, opts.LifetimeMinutes);
+                var token = new Token(opts.Length, opts.LifetimeMinutes, context);
                 keyedTokens.Add((key, token));
                 return token;
             }
         }
 
         /// <inheritdoc/>
-        public Token? Get(string key, string confirmationCode)
+        public Token? Get(string key, string confirmationCode, string context = "")
         {
             key = NormalisedKey(key);
             lock (keyedTokens)
             {
-                foreach (var token in keyedTokens.Where(x => x.Key == key))
+                foreach (var token in keyedTokens.Where(x => x.Key == key).Select(x => x.Token))
                 {
-                    if (token.Token.IsExpired) continue;
-                    if (token.Token.Matches(confirmationCode)) return token.Token;
+                    if (token.IsExpired) continue;
+                    if (token.Matches(confirmationCode, context)) return token;
                 }
                 return null;
             }

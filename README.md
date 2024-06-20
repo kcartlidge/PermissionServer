@@ -8,7 +8,7 @@ Add email-based sign-up/login to your site/app with minimal effort!
 
 *Licensed under the [AGPL](./LICENSE.txt), you are free to use Permission Server in any project whether open source, free, or commercial. For further details [see here](./LICENSE.txt).*
 
-*Copyright 2023 K Cartlidge.*
+*Copyright 2024 K Cartlidge.*
 
 ---
 
@@ -40,13 +40,11 @@ Add email-based sign-up/login to your site/app with minimal effort!
 - Auto-expiring tokens (configurable lifetime)
 - Multiple active tokens in case of email issues
   - Maximum active per email is configurable
+- Optional context to deter token stealing
+  - Compares your own context during confirmation flow
+  - EG using a session id ensures the same browser session
 - Minimal supporting code required
 - No database needed
-
-Potential future features:
-
-- Optional: database token storage
-- Optional: full account management
 
 ### Overview
 
@@ -63,6 +61,7 @@ Reduce your risk and, for many apps/sites, your overheads too due to the ability
 - Your app/site has a confirmation screen/page asking for the email address and token
 - Permission Server validates the token is a match and has not expired
   - Having the token from the email account proves email address access
+  - An optional context (eg session id) can be added when sending and checked upon confirmation
   - Your app/site is now safe to either create an account or sign the user in
 
 #### For personal sites
@@ -118,6 +117,12 @@ However *this is exactly the same risk as a typical password-based system*.
 Why?  A password-based system generally has a forgotten or reset password feature.  This works via their emails, which means if their email account has been compromised they are equally at risk as that's now working as a password-less system in that they get to set/reset their password based on their ability to access the recovery email.
 
 The only real extra protection is two-factor/multi-factor (eg SMS or TOTP codes) which you are free to add to a password-less system just as you would a password-based one; it requires the same amount of effort regardless.
+
+One extra step Permission Server offers is the use of an optional `context` both when starting and when confirming the email address.  If a context is added at the start then the same context *must* be provided at the end to complete confirmation.
+
+By choosing what context your code will pass in you choose the level of granularity for protecting the confirmation flow. If you provide the current session id then for the same user it will be the same at both ends and confirmation will succeed. If the email is hacked and somebody else tries to use the token it will fail as their session will differ.
+
+In the same way you could limit it to the same browser using browser fingerprinting or the same network using IP address. If you have nothing else specific enough you can use something like a guid stored in a secure cookie; if you don't have the cookie you can't use the token because you won't have the cookie-backed guid.
 
 ### License
 
@@ -208,6 +213,7 @@ Note that the `Subject` and `Body` in the configuration above are templates whic
 - Your code needs to provide Permission Server an email address and the URL that the email directs the user to. In the background a token will be generated and a confirmation request email sent.
 - When the user clicks that link and comes back into your code you then need to pass Permission Server the email address plus the confirmation code that the user obtains from within their confirmation email. Permission Server will then confirm that the confirmation code is one that is correct, current, and issued for that email address.
 - With just two methods you've got proof that the user has access to the email address, leaving you free to either create an account or sign them in to an existing one based on that confirmation.
+  - By using the `context` as described in the 'concerns' section above you gain extra confidence
 
 `AccountController.cs` (for example)
 
@@ -230,8 +236,10 @@ public IActionResult Login() => View();
 public async Task<IActionResult> SendConfirmation(LoginRequest model)
 {
     // ...
+    // The context below is optional.
+    var context = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
     var confirmUrl = $"{Request.Scheme}://{Request.Host}/{nameof(Confirm)}";
-    var added = await permissionServer.StartConfirmation(model.EmailAddress, confirmUrl);
+    var added = await permissionServer.StartConfirmation(model.EmailAddress, confirmUrl, context);
     if (added)
     {
         // A token was created and the user has been emailed the confirmation code.
@@ -254,7 +262,9 @@ public IActionResult Confirm() => View();
 public async Task<IActionResult> ConfirmPost(ConfirmationRequest model)
 {
     // ...
-    var matched = permissionServer.CompleteConfirmation(model.EmailAddress, model.ConfirmationCode);
+    // The context below is optional.
+    var context = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
+    var matched = permissionServer.CompleteConfirmation(model.EmailAddress, model.ConfirmationCode, context);
     if (matched)
     {
         // Email account access has been confirmed.
@@ -325,6 +335,8 @@ The `SendConfirmation` endpoint is given an email address by the user. It compos
 
 The `ConfirmPost` endpoint is again given an email address by the user but this time accompanied by the confirmation code obtained by reading that email.  If everything matches the user is signed in.  There are example claims added in at that point but obviously that's entirely down to you and how your application works.
 
+Both `SendConfirmation` and `ConfirmPost` use the optional `context` parameter when calling Permission Server to restrict the token confirmation step to users who share the same context given during the initial send step.
+
 For completeness there's a `Logout` endpoint too but that's a concern of the application itself and nothing to do with Permission Server.
 
 **Suitable views exist within `Views/Account` for starting and finishing the confirmation flow**
@@ -338,7 +350,7 @@ At the top of the view the current user and login status is assessed.
 In the navigation area the menu links are shown or hidden accordingly.
 And in the `<main>` area the currently signed-in user is shown before the content is rendered.
 
-**A stub dashboard page has been added to show a protected page in use**
+**A stub `Views/Home/Dashboard` page has been added to show a protected page in use**
 
 This involves a new endpoint in `Controllers/HomeController.cs` and a related `Views/Home/Dashboard.cshtml`.  Both are virtually empty; the only point is to show the `[Authorize]` attribute protecting the page.
 

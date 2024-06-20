@@ -27,9 +27,13 @@ namespace SampleSite.Controllers
             {
                 try
                 {
+                    // This may be null in which case the extra factor is useless.
+                    // The intellisense on the StartConfirmation parameter has suggestions.
+                    var context = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
+
                     // Start the confirmation process.
                     var confirmUrl = $"{Request.Scheme}://{Request.Host}/{nameof(Confirm)}";
-                    var added = await permissionServer.StartConfirmation(model.EmailAddress, confirmUrl);
+                    var added = await permissionServer.StartConfirmation(model.EmailAddress, confirmUrl, context);
                     if (added)
                     {
                         // Always sign out if successfully starting a login attempt.
@@ -57,7 +61,10 @@ namespace SampleSite.Controllers
         {
             if (ModelState.IsValid)
             {
-                var matched = permissionServer.CompleteConfirmation(model.EmailAddress, model.ConfirmationCode);
+                // See the comments in SendConfirmation.
+                var context = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
+
+                var matched = permissionServer.CompleteConfirmation(model.EmailAddress, model.ConfirmationCode, context);
                 if (matched)
                 {
                     // At this point the site's own systems should be checked for
